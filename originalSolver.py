@@ -36,7 +36,7 @@ def build_board():
                 pass
 
     # Convert all the string elements of the 'auxiliary' row to lists, then adding to the board 9 lists,
-    # everyone one of them represents one row
+    # every one of them represents one row
     board = []
     for i in range(len(auxiliary)):
         board.append(list(auxiliary[i]))
@@ -47,61 +47,80 @@ def build_board():
             board[i][j] = int(board[i][j])
     return board
 
-def print_board(board):
-    line = ''
-    for i in range(len(board)):
-        board[i].insert(0, '')
-        for j in range(len(board[i])):
-            if j%3 == 0 and j != 0:
-                line = line + str(board[i][j]) + ' | '
-            else:
-                line = line + str(board[i][j]) + ' '
-
-    print('')
-    print('   ' + '––––––––––––––––––––––––––')
-    print('   ' + '| ' + line[:24])
-    print('   ' + '| ' +  line[25:49])
-    print('   ' + '| ' +  line[50:74])
-    print('   ' + '––––––––––––––––––––––––––')
-    print('   ' + '| ' + line[75:99])
-    print('   ' + '| ' +  line[100:124])
-    print('   ' + '| ' +  line[125:149])
-    print('   ' + '––––––––––––––––––––––––––')
-    print('   ' + '| ' + line[150:174])
-    print('   ' + '| ' +  line[175:199])
-    print('   ' + '| ' +  line[200:224])
-    print('   ' + '––––––––––––––––––––––––––')
 
 
+def solve(board):
+    find = find_empty(board)
+    if not find:
+        print('')
+        print('––––––––––––––––––––––––––––––––––––––')
+        print('Solved!')
+        print('––––––––––––––––––––––––––––––––––––––')
+        print('')
+        return True
+    else:
+        row, col = find
 
-def find_empty(board):
-    for i in range(len(board)):
-        for j in range(len(board)):
-            if board[i][j] == 0:
-                a = (i, j)
-                print(a)
-                return (i, j) # first - row (y), second - column (x)
+    for i in range(1,10):
+        if valid(board, i, (row, col)):
+            board[row][col] = i
+
+            if solve(board):
+                return True
+
+            board[row][col] = 0
+
+    return False
+
 
 def valid(board, num, pos):
-
     # Check row
-
     for i in range(len(board[0])):
-        if board[pos[0][i]] == num and pos[1] != i:
+        if board[pos[0]][i] == num and pos[1] != i:
             return False
 
     # Check column
-
     for i in range(len(board)):
         if board[i][pos[1]] == num and pos[0] != i:
             return False
 
     # Check box
-
     box_x = pos[1] // 3
     box_y = pos[0] // 3
 
-    for i in range(box_y * 3,  box_y * 3 +3):
-        for j in range(box_x * 3,  box_x * 3 +3):
+    for i in range(box_y*3, box_y*3 + 3):
+        for j in range(box_x * 3, box_x*3 + 3):
             if board[i][j] == num and (i, j) != pos:
-               return False
+                return False
+
+    return True
+
+
+def print_board(board):
+    for i in range(len(board)):
+        if i % 3 == 0 and i != 0:
+            print("–––––––––––––––––––––––––––––")
+
+        for j in range(len(board[0])):
+            if j % 3 == 0:
+                print(" | ", end="")
+
+            if j == 8:
+                print(str(board[i][j]) + " | ")
+            else:
+                print(str(board[i][j]) + " ", end="")
+
+
+def find_empty(board):
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == 0:
+                return (i, j)  # row, col
+
+    return None
+
+print('')
+board = build_board()
+print_board(board)
+solve(board)
+print_board(board)
